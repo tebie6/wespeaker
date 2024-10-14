@@ -18,7 +18,6 @@ h5py
 pycodestyle==2.6.0
 pyflakes==2.2.0
 lmdb==1.3.0
-onnxruntime
 soundfile
 pypeln==0.4.9
 silero-vad
