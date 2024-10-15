@@ -7,7 +7,7 @@ requirements = [
     "umap-learn==0.5.6",
     "torch>=1.12.0",
     "torchaudio>=0.12.0",
-    "silero-vad",
+    "git+https://github.com/tebie6/silero-vad.git",
 ]
 
 setup(
