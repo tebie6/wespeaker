@@ -17,7 +17,7 @@ import os
 import sys
 
 import numpy as np
-from silero_vad import load_silero_vad, read_audio, get_speech_timestamps
+# from silero_vad import load_silero_vad, read_audio, get_speech_timestamps
 import torch
 import torchaudio
 import torchaudio.compliance.kaldi as kaldi
@@ -48,7 +48,8 @@ class Speaker:
             configs['model'])(**configs['model_args'])
         load_checkpoint(self.model, model_path)
         self.model.eval()
-        self.vad = load_silero_vad()
+        # self.vad = load_silero_vad()
+        self.vad = None
         self.table = {}
         self.resample_rate = 16000
         self.apply_vad = False
@@ -129,30 +130,30 @@ class Speaker:
         return self.extract_embedding_from_pcm(pcm, sample_rate)
 
     def extract_embedding_from_pcm(self, pcm: torch.Tensor, sample_rate: int):
-        if self.apply_vad:
-            # TODO(Binbin Zhang): Refine the segments logic, here we just
-            # suppose there is only silence at the start/end of the speech
-            vad_sample_rate = 16000
-            wav = pcm
-            if wav.size(0) > 1:
-                wav = wav.mean(dim=0, keepdim=True)
-
-            if sample_rate != vad_sample_rate:
-                transform = torchaudio.transforms.Resample(
-                    orig_freq=sample_rate,
-                    new_freq=vad_sample_rate)
-                wav = transform(wav)
-            segments = get_speech_timestamps(wav, self.vad, return_seconds=True)
-            pcmTotal = torch.Tensor()
-            if len(segments) > 0:  # remove all the silence
-                for segment in segments:
-                    start = int(segment['start'] * sample_rate)
-                    end = int(segment['end'] * sample_rate)
-                    pcmTemp = pcm[0, start:end]
-                    pcmTotal = torch.cat([pcmTotal, pcmTemp], 0)
-                pcm = pcmTotal.unsqueeze(0)
-            else:  # all silence, nospeech
-                return None
+        # if self.apply_vad:
+        #     # TODO(Binbin Zhang): Refine the segments logic, here we just
+        #     # suppose there is only silence at the start/end of the speech
+        #     vad_sample_rate = 16000
+        #     wav = pcm
+        #     if wav.size(0) > 1:
+        #         wav = wav.mean(dim=0, keepdim=True)
+        #
+        #     if sample_rate != vad_sample_rate:
+        #         transform = torchaudio.transforms.Resample(
+        #             orig_freq=sample_rate,
+        #             new_freq=vad_sample_rate)
+        #         wav = transform(wav)
+        #     segments = get_speech_timestamps(wav, self.vad, return_seconds=True)
+        #     pcmTotal = torch.Tensor()
+        #     if len(segments) > 0:  # remove all the silence
+        #         for segment in segments:
+        #             start = int(segment['start'] * sample_rate)
+        #             end = int(segment['end'] * sample_rate)
+        #             pcmTemp = pcm[0, start:end]
+        #             pcmTotal = torch.cat([pcmTotal, pcmTemp], 0)
+        #         pcm = pcmTotal.unsqueeze(0)
+        #     else:  # all silence, nospeech
+        #         return None
         pcm = pcm.to(torch.float)
         if sample_rate != self.resample_rate:
             pcm = torchaudio.transforms.Resample(
