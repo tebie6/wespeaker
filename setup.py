@@ -7,15 +7,11 @@ requirements = [
     "umap-learn==0.5.6",
     "torch>=1.12.0",
     "torchaudio>=0.12.0",
-    "silero-vad",
 ]
 
 setup(
     name="wespeaker",
     install_requires=requirements,
-    dependency_links=[
-        "git+https://github.com/tebie6/silero-vad.git#egg=silero-vad"
-    ],
     packages=find_packages(),
     entry_points={
         "console_scripts": [
